@@ -9,6 +9,8 @@ if __name__ == "__main__":
 
     track_points, track_width = [[1, 3], [2, 6], [5, 6], [4, 2], [6, -2], [3, 0], [1, 3]], 1
 
+    # track_points, track_width = [[2, 5], [3, 6], [7, 2], [4, 1], [2, 3], [2, 5]], 1
+
     # holy shit this is messy asf 
 
     ##################################################################################
@@ -33,8 +35,8 @@ if __name__ == "__main__":
     optimal_y = new_track.optimal.final_spline_y(optimal_ts)
     
     # Plots spline representation of track midline
-    plt.plot(disc_x, disc_y)
-    plt.plot(x, y, 'ro')
+    # plt.plot(disc_x, disc_y)
+    # plt.plot(x, y, 'ro')
     
     # Outer and inner bounds
     plt.plot([point[0] for point in outer_bound], [point[1] for point in outer_bound], 'ro')

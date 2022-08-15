@@ -105,7 +105,7 @@ class Path(Track):
 
         optimal_points.append(optimal_points[0])
 
-        print(optimal_points)
+        # print(optimal_points)
 
         spline_x = CubicSpline([x for x in range(1, len(optimal_points) + 1)], [point[0] for point in optimal_points])
         spline_y = CubicSpline([x for x in range(1, len(optimal_points) + 1)], [point[1] for point in optimal_points])
