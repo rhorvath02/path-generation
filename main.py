@@ -33,14 +33,44 @@ if __name__ == "__main__":
     optimal_ts = np.arange(1, max(final_t_lst), 0.01)
     optimal_x = new_track.optimal.final_spline_x(optimal_ts)
     optimal_y = new_track.optimal.final_spline_y(optimal_ts)
+
+    test = new_track.optimal.curvature_from_dist(2)
+
+    test5 = new_track.optimal.curvature_from_dist(2.5)
+
+    test2 = new_track.optimal.curvature_from_dist(3)
+
+    test3 = new_track.optimal.curvature_from_dist(4)
+
+    test4 = new_track.optimal.curvature_from_dist(7)
+
+    print(test[0])
+
+    print(test5[0])
+
+    print(test2[0])
+
+    print(test3[0])
+
+    print(test4[0])
+
+    plt.plot(new_track.optimal.final_spline_x(test[1]), new_track.optimal.final_spline_y(test[1]), 'ro')
+
+    plt.plot(new_track.optimal.final_spline_x(test5[1]), new_track.optimal.final_spline_y(test5[1]), 'ro')
+
+    plt.plot(new_track.optimal.final_spline_x(test2[1]), new_track.optimal.final_spline_y(test2[1]), 'ro')
+
+    plt.plot(new_track.optimal.final_spline_x(test3[1]), new_track.optimal.final_spline_y(test3[1]), 'ro')
+
+    plt.plot(new_track.optimal.final_spline_x(test4[1]), new_track.optimal.final_spline_y(test4[1]), 'ro')
     
     # Plots spline representation of track midline
     # plt.plot(disc_x, disc_y)
     # plt.plot(x, y, 'ro')
     
     # Outer and inner bounds
-    plt.plot([point[0] for point in outer_bound], [point[1] for point in outer_bound], 'ro')
-    plt.plot([point[0] for point in inner_bound], [point[1] for point in inner_bound], 'ro')
+    # plt.plot([point[0] for point in outer_bound], [point[1] for point in outer_bound], 'ro')
+    # plt.plot([point[0] for point in inner_bound], [point[1] for point in inner_bound], 'ro')
 
     # Optimal points
     plt.plot(optimal_x, optimal_y)

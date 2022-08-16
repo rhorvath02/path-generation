@@ -87,7 +87,7 @@ class Path(Track):
 
         curvature = 0
         # Change 0.5 below to change accuracy of cost function (0.1 takes 4 mins to run, so might need a better method)
-        for t in np.arange(1, disc_t[-1] + 1, 0.5):
+        for t in np.arange(1, disc_t[-1] + 1, 0.1):
             curvature += self.curvature_calc(t, spline_x, spline_y)
 
         return curvature
@@ -125,6 +125,11 @@ class Path(Track):
         cross = abs(np.cross((r_dot_x, r_dot_y), (r_double_dot_x, r_double_dot_y)))
 
         return (cross / ((r_dot_x)**2 + (r_dot_y)**2)**(3/2))
+    
+    def curvature_from_dist(self, dist):
+        t = fsolve(lambda x: self.arc_length(self.final_spline_x, self.final_spline_y)(x) - dist, 1)[0]
+
+        return self.curvature_calc(t, self.final_spline_x, self.final_spline_y), t
 
 
 class Gate():
