@@ -26,23 +26,23 @@ if __name__ == "__main__":
     outer_bound = [gate.bounds(track_width)[0] for gate in new_track.gates]
     inner_bound = [gate.bounds(track_width)[1] for gate in new_track.gates]
 
-    final_t_lst = [fsolve(lambda t: new_track.optimal.final_spline_x(t) - new_track.optimal.optimal_points[-1][0], len(eq_t)), 
-    fsolve(lambda x: new_track.optimal.final_spline_x(x) - new_track.optimal.optimal_points[-1][0], len(eq_t))]
+    final_t = max([fsolve(lambda t: new_track.optimal.final_spline_x(t) - new_track.optimal.optimal_points[-1][0], len(eq_t)), 
+    fsolve(lambda x: new_track.optimal.final_spline_x(x) - new_track.optimal.optimal_points[-1][0], len(eq_t))])
 
-    optimal_ts = np.arange(1, max(final_t_lst), 0.01)
+    optimal_ts = np.arange(1, final_t, 0.01)
     optimal_x = new_track.optimal.final_spline_x(optimal_ts)
     optimal_y = new_track.optimal.final_spline_y(optimal_ts)
 
     # Saves csv of curvature as a function of distance
-    df_setup = {"dist": [], "curvature": []}
+    # df_setup = {"dist": [], "curvature": []}
 
-    for i in np.arange(0, 23, 0.01):
-        df_setup["dist"] += [i]
-        df_setup["curvature"] += [new_track.optimal.curvature_from_dist(i)[0]]
+    # for i in np.arange(0, 23, 0.01):
+    #     df_setup["dist"] += [i]
+    #     df_setup["curvature"] += [new_track.optimal.curvature_from_dist(i)[0]]
     
-    df = pd.DataFrame(df_setup)
+    # df = pd.DataFrame(df_setup)
 
-    df.to_csv("urmomv2.csv")
+    # df.to_csv("urmomv2.csv")
     
     # Plots spline representation of track midline
     plt.plot(disc_x, disc_y)
