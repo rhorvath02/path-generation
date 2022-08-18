@@ -127,10 +127,14 @@ class Path(Track):
         return (cross / ((r_dot_x)**2 + (r_dot_y)**2)**(3/2))
     
     def curvature_from_dist(self, dist):
+        # Calculates final t value of spline (allows the calculation of the proper arc length integrand)
         final_t = max([fsolve(lambda t: self.final_spline_x(t) - self.optimal_points[-1][0], len(self.eq_t)), 
         fsolve(lambda x: self.final_spline_x(x) - self.optimal_points[-1][0], len(self.eq_t))])
-
+        
+        # Arc length integrand for optimized spline
         distance_integrand = self.arc_length(self.final_spline_x, self.final_spline_y, final_t)
+
+        # Calculates t based on given distance (arc length)
         t = fsolve(lambda t: distance_integrand(t) - distance_integrand(1) - dist, 1)[0]
 
         return self.curvature_calc(t, self.final_spline_x, self.final_spline_y), t
