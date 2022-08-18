@@ -3,6 +3,7 @@ from generation import Path as Path
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 if __name__ == "__main__":
@@ -34,39 +35,49 @@ if __name__ == "__main__":
     optimal_x = new_track.optimal.final_spline_x(optimal_ts)
     optimal_y = new_track.optimal.final_spline_y(optimal_ts)
 
-    test = new_track.optimal.curvature_from_dist(5)
+    df_setup = {"dist": [], "curvature": []}
 
-    test5 = new_track.optimal.curvature_from_dist(10)
+    for i in np.arange(0, 23, 0.01):
+        df_setup["dist"] += [i]
+        df_setup["curvature"] += [new_track.optimal.curvature_from_dist(i)[0]]
+    
+    df = pd.DataFrame(df_setup)
 
-    test2 = new_track.optimal.curvature_from_dist(15)
+    df.to_csv("urmomv2.csv")
 
-    test3 = new_track.optimal.curvature_from_dist(20)
+    # test = new_track.optimal.curvature_from_dist(21)
 
-    # test4 = new_track.optimal.curvature_from_dist(7)
+    # test5 = new_track.optimal.curvature_from_dist(22)
 
-    print(test[0])
+    # test2 = new_track.optimal.curvature_from_dist(23)
 
-    print(test5[0])
+    # test3 = new_track.optimal.curvature_from_dist(23.5)
 
-    print(test2[0])
+    # # test4 = new_track.optimal.curvature_from_dist(7)
 
-    print(test3[0])
+    # print(test[0], test[1])
 
-    # print(test4[0])
+    # print(test5[0], test5[1])
 
-    plt.plot(new_track.optimal.final_spline_x(test[1]), new_track.optimal.final_spline_y(test[1]), 'ro')
+    # print(test2[0], test2[1])
 
-    plt.plot(new_track.optimal.final_spline_x(test5[1]), new_track.optimal.final_spline_y(test5[1]), 'ro')
+    # print(test3[0], test3[1])
 
-    plt.plot(new_track.optimal.final_spline_x(test2[1]), new_track.optimal.final_spline_y(test2[1]), 'ro')
+    # # print(test4[0])
 
-    plt.plot(new_track.optimal.final_spline_x(test3[1]), new_track.optimal.final_spline_y(test3[1]), 'ro')
+    # plt.plot(new_track.optimal.final_spline_x(test[1]), new_track.optimal.final_spline_y(test[1]), 'ro')
+
+    # plt.plot(new_track.optimal.final_spline_x(test5[1]), new_track.optimal.final_spline_y(test5[1]), 'ro')
+
+    # plt.plot(new_track.optimal.final_spline_x(test2[1]), new_track.optimal.final_spline_y(test2[1]), 'ro')
+
+    # plt.plot(new_track.optimal.final_spline_x(test3[1]), new_track.optimal.final_spline_y(test3[1]), 'ro')
 
     # plt.plot(new_track.optimal.final_spline_x(test4[1]), new_track.optimal.final_spline_y(test4[1]), 'ro')
     
     # Plots spline representation of track midline
-    plt.plot(disc_x, disc_y)
-    plt.plot(x, y, 'ro')
+    # plt.plot(disc_x, disc_y)
+    # plt.plot(x, y, 'ro')
     
     # Outer and inner bounds
     plt.plot([point[0] for point in outer_bound], [point[1] for point in outer_bound], 'ro')

@@ -16,7 +16,7 @@ class Track():
         self.spline_y = CubicSpline(self.t, [point[1] for point in self.track_pts], bc_type = "periodic")
 
         # Integrand of arc length calculation
-        self.arc_length_integrand = self.arc_length(self.spline_x, self.spline_y)
+        self.arc_length_integrand = self.arc_length(self.spline_x, self.spline_y, self.t[-1])
 
         # t such that distance along spline remains constant (track width)
         self.eq_t = self.equal_spacing(width)
@@ -25,12 +25,12 @@ class Track():
         self.gates = [Gate(eq_t, self.spline_y.derivative(1)(eq_t) / self.spline_x.derivative(1)(eq_t), self.spline_x, self.spline_y) for eq_t in self.eq_t]
 
         # Optimal path generation
-        self.optimal = Path(self.gates, self.track_pts, width)
+        self.optimal = Path(self.gates, self.eq_t, width)
 
     # arrives at a new function f(x) = sqrt((dx/dt)**2 + (dy/dt)**2)
-    def arc_length(self, x_t, y_t):
+    def arc_length(self, x_t, y_t, max_t):
         # Defines a list of t for calculations with discrete points
-        discrete_t = np.arange(1, self.t[-1], 0.001)
+        discrete_t = np.arange(1, max_t, 0.001)
         
         # Takes derivative of parameterized input splines
         dxdt = x_t.derivative(1)
@@ -69,9 +69,9 @@ class Track():
         return adjusted_t
 
 class Path(Track):
-    def __init__(self, gates, init_points, width):
+    def __init__(self, gates, eq_t, width):
         self.gates = gates
-        self.init_points = init_points
+        self.eq_t = eq_t
         self.width = width
 
         self.t = [gate.t for gate in self.gates]
@@ -127,7 +127,11 @@ class Path(Track):
         return (cross / ((r_dot_x)**2 + (r_dot_y)**2)**(3/2))
     
     def curvature_from_dist(self, dist):
-        t = fsolve(lambda x: self.arc_length(self.final_spline_x, self.final_spline_y)(x) - dist, 1)[0]
+        final_t = max([fsolve(lambda t: self.final_spline_x(t) - self.optimal_points[-1][0], len(self.eq_t)), 
+        fsolve(lambda x: self.final_spline_x(x) - self.optimal_points[-1][0], len(self.eq_t))])
+
+        distance_integrand = self.arc_length(self.final_spline_x, self.final_spline_y, final_t)
+        t = fsolve(lambda t: distance_integrand(t) - distance_integrand(1) - dist, 1)[0]
 
         return self.curvature_calc(t, self.final_spline_x, self.final_spline_y), t
 
