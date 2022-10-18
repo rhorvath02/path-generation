@@ -65,8 +65,36 @@ class Track():
         
         # Last value from fsolve could surpass self.t[-1], so we need to correct t_vals to remove points outside the intended bounds
         adjusted_t = [t for t in t_vals if t <= self.t[-1]]
-
         return adjusted_t
+
+    def center_curvature_calc(self, eq_t, disc_x, disc_y):
+        # let r(t) = (x(t), y(t))
+
+        r_dot_x, r_dot_y = disc_x.derivative(1)(eq_t), disc_y.derivative(1)(eq_t)
+
+        r_double_dot_x, r_double_dot_y = disc_x.derivative(2)(eq_t), disc_y.derivative(2)(eq_t)
+
+        # k = ||r'(t) x r''(t)|| / ||r'(t)||**3
+
+        cross = np.cross((r_dot_x, r_dot_y), (r_double_dot_x, r_double_dot_y))
+        direction = np.sign(cross)
+
+        return (abs(cross) / ((r_dot_x) ** 2 + (r_dot_y) ** 2) ** (3 / 2)), direction
+
+    def center_curvature_from_dist(self, dist):
+        # Calculates final t value of spline (allows the calculation of the proper arc length integrand)
+        final_t = max([fsolve(lambda t: self.x(t) - self.optimal_points[-1][0], len(self.eq_t)),
+                       fsolve(lambda x: self.final_spline_x(x) - self.optimal_points[-1][0], len(self.eq_t))])
+
+        # Arc length integrand for optimized spline
+        distance_integrand = self.arc_length(self.final_spline_x, self.final_spline_y, final_t)
+
+        # Calculates t based on given distance (arc length)
+        t = fsolve(lambda t: distance_integrand(t) - distance_integrand(1) - dist, 1)[0]
+
+        curv, dir = self.center_curvature_calc(t, self.final_spline_x, self.final_spline_y)
+
+        return curv, t, dir
 
 class Path(Track):
     def __init__(self, gates, eq_t, width):
@@ -94,7 +122,7 @@ class Path(Track):
 
         # Change 0.5 below to change accuracy of cost function (0.1 takes 4 mins to run, so might need a better method)
         for t in np.arange(0, adjusted_t[-1], 0.1):
-            curvature += self.curvature_calc(t, spline_x, spline_y)
+            curvature += self.curvature_calc(t, spline_x, spline_y)[0]
 
         return curvature
 
@@ -129,9 +157,10 @@ class Path(Track):
 
         # k = ||r'(t) x r''(t)|| / ||r'(t)||**3
 
-        cross = abs(np.cross((r_dot_x, r_dot_y), (r_double_dot_x, r_double_dot_y)))
+        cross = np.cross((r_dot_x, r_dot_y), (r_double_dot_x, r_double_dot_y))
+        direction = np.sign(cross)
 
-        return (cross / ((r_dot_x)**2 + (r_dot_y)**2)**(3/2))
+        return (abs(cross) / ((r_dot_x)**2 + (r_dot_y)**2)**(3/2)), direction
     
     def curvature_from_dist(self, dist):
         # Calculates final t value of spline (allows the calculation of the proper arc length integrand)
@@ -144,7 +173,9 @@ class Path(Track):
         # Calculates t based on given distance (arc length)
         t = fsolve(lambda t: distance_integrand(t) - distance_integrand(1) - dist, 1)[0]
 
-        return self.curvature_calc(t, self.final_spline_x, self.final_spline_y), t
+        curv, dir = self.curvature_calc(t, self.final_spline_x, self.final_spline_y)
+
+        return curv, t, dir
 
 
 class Gate():
